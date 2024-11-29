@@ -1,86 +1,105 @@
 # Custom Memory Allocation Library
 
-## Project Overview
+## Introduction
 
 This project implements a custom memory allocation library with two distinct allocation strategies: Best Fit and First Fit. The implementation demonstrates low-level memory management techniques by replacing the standard `malloc()` and `free()` functions.
 
-## Key Features
+## Table of Contents
+1. [Features](#1-features)
+2. [Installation](#2-installation)
+3. [Usage](#3-usage)
+4. [Dependencies](#4-dependencies)
+5. [Project Structure](#5-project-structure)
+6. [Contributors](#6-contributors)
 
-- Custom memory allocation strategies
-- Memory pool management using `mmap()`
-- Dynamic memory chunk tracking
-- Metadata-based memory management
-- Configurable allocation policies
+## 1. Features
 
-## Implementation Architecture
+The custom memory allocation library offers advanced memory management capabilities:
 
-### Memory Management Structure
+- Two distinct memory allocation strategies:
+  - Best Fit: Minimizes internal memory fragmentation
+  - First Fit: Optimizes allocation speed
+- Dynamic memory pool management
+- 20,000-byte pre-allocated memory space
+- Metadata-driven memory tracking
+- Advanced chunk splitting and merging
+- Low-level memory control using `mmap()`
 
-```c
-typedef struct block {
-    size_t          size;       // Memory chunk size
-    int             free;       // Allocation status
-    struct block    *prev;      // Previous chunk reference
-    struct block    *next;      // Next chunk reference
-} Block;
+## 2. Installation
+
+### Prerequisites
+- Linux operating system (Ubuntu 18.04 recommended)
+- GCC compiler
+- Basic understanding of system programming
+
+### Compilation Instructions
+```bash
+# Compile Best Fit implementation
+gcc -shared -fPIC bf.c -o bf.so
+
+# Compile First Fit implementation
+gcc -shared -fPIC ff.c -o ff.so
 ```
 
-### Allocation Strategies
+## 3. Usage
 
-#### Best Fit Strategy
-- Selects the smallest free chunk that accommodates the requested memory
-- Minimizes internal memory fragmentation
-- Performs comprehensive chunk size comparison
-
-#### First Fit Strategy
-- Allocates the first available chunk that meets size requirements
-- Faster allocation process
-- Simplifies memory search algorithm
-
-## Core Functions
-
-### `malloc(size_t ask_size)`
-- Initializes 20,000-byte memory pool on first allocation
-- Rounds requested size to 32-byte multiples
-- Implements chunk selection and splitting
-- Handles zero-size requests by reporting maximum free chunk
-
-### `free(char* ptr)`
-- Marks memory chunk as free
-- Supports adjacent chunk merging
-- Reduces memory fragmentation
-- Maintains linked list integrity
-
-## Memory Pool Management
-
-- Pre-allocates 20,000 bytes using `mmap()`
-- Uses 32-byte metadata headers
-- Supports dynamic chunk splitting
-- Implements coalescing of free adjacent chunks
-
-## Compilation and Usage
-
-### Compilation
+### Running with Preloaded Library
 ```bash
-gcc -shared -fPIC bf.c -o bf.so  # Best Fit
-gcc -shared -fPIC ff.c -o ff.so  # First Fit
-```
-
-### Execution
-```bash
+# Best Fit allocation
 LD_PRELOAD=/path/to/bf.so ./main
+
+# First Fit allocation
 LD_PRELOAD=/path/to/ff.so ./main
 ```
 
-## Limitations
+### Memory Allocation Example
+```c
+// Basic memory allocation workflow
+char* memory_block1 = malloc(100);   // Allocate 100 bytes
+char* memory_block2 = malloc(200);   // Allocate 200 bytes
 
-- Fixed 20,000-byte memory pool
-- Requires manual memory management
-- Not recommended for production environments
-- Specific to Linux systems
+// Perform operations with allocated memory
+// ...
 
-## System Requirements
+// Free allocated memory
+free(memory_block1);
+free(memory_block2);
 
-- Linux environment (Tested on Ubuntu 18.04)
-- GCC compiler
-- Basic understanding of memory management
+// Retrieve maximum free chunk size
+malloc(0);
+```
+
+## 4. Dependencies
+
+### System Requirements
+- Linux kernel supporting `mmap()`
+- POSIX-compliant system
+- GCC compiler supporting C99 standard
+- `sys/mman.h` header
+
+### Required Libraries
+- Standard C library
+- POSIX threads library
+
+## 5. Project Structure
+
+```
+memory-allocation-library/
+│
+├── bf.c              # Best Fit implementation
+├── ff.c              # First Fit implementation
+├── bf.so             # Best Fit shared library
+├── ff.so             # First Fit shared library
+├── README.md         # Project documentation
+└── test.c            # Test program
+```
+
+### Key Components
+- `Block` structure for memory chunk management
+- Custom `malloc()` implementation
+- Custom `free()` implementation
+- Maximum free chunk size detection
+
+## 6. Contributors
+- **Name:** Hua-En (Benson) Lee
+- **Email:** enen1015@gmail.com
